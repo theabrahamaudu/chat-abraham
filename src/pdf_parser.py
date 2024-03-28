@@ -6,6 +6,7 @@ import google.generativeai as genai
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+from langchain.chains import ConversationalRetrievalChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import faiss
 
@@ -47,7 +48,8 @@ def get_vector_store(text_chunks: list[str]) -> None:
 def get_conversational_chain():
     prompt_template = """
     Answer the question as detailed as possible from the provided context, make sure to provide all the details,
-    use good judgement to answer the question based on the context of the document. If the answer is not in
+    use good judgement to answer the question based on the context of the document. You are allowed to reference previous prompts and responses
+    to give better answers. If the answer is not in
     provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
     Context:\n {context}?\n
     Question: \n{question}\n
@@ -69,11 +71,12 @@ def get_conversational_chain():
         model,
         chain_type="stuff",
         prompt=prompt,
+        # memory=memory
     )
     return chain
 
 
-def user_input(question):
+def user_input(question, chat_history=[]) -> str:
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001"
     )
@@ -91,10 +94,11 @@ def user_input(question):
 
     chain = get_conversational_chain()
 
-    response = chain(
+    response = chain.invoke(
         {
             "input_documents": docs,
-            "question": question
+            "question": question,
+            "chat_history": chat_history,
         },
         return_only_outputs=True
     )
