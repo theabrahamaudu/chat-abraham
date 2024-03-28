@@ -1,2 +1,11 @@
 # Local packages
 -e .
+
+# Other packages
+google-generativeai
+langchain_google_genai
+python-dotenv
+langchain
+PyPDF2
+faiss-cpu
+streamlit
