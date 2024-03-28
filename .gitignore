@@ -128,7 +128,7 @@ ENV/
 env.bak/
 venv.bak/
 api-key.txt
-local_index
+
 
 # Spyder project settings
 .spyderproject

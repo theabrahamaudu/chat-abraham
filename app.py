@@ -17,7 +17,7 @@ def main():
     with st.sidebar:
         if st.button("Configure App"):
             with st.spinner("Configuring App..."):
-                pdf_text = get_pdf_text("./data/UNFINISHED_Audu_2020.pdf")
+                pdf_text = get_pdf_text("./data")
                 text_chunks = get_text_chunks(pdf_text)
                 get_vector_store(text_chunks)
                 st.success("App Configured!")

@@ -10,18 +10,43 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import faiss
 
+from vertexai.preview.generative_models import (
+    HarmCategory,
+    HarmBlockThreshold
+    )
+from google.cloud.aiplatform_v1beta1.types.content import SafetySetting
+
 dotenv.load_dotenv()
 genai.configure(
     api_key=os.getenv("GOOGLE_API_KEY"),
 )
 
 
-def get_pdf_text(pdf_doc: str) -> str:
+def scanDir(directory: str, extension: str) -> list[str]:
+    """Check specified directory and return list of files with
+    specified extension
+
+    Args:
+        extension (str): extension type to be searched for e.g. ".txt"
+
+    Returns:
+        list: strings of file names with specified extension
+    """    
+    files: list = []
+    for filename in os.listdir(directory):
+        if filename.endswith(extension):
+            files.append(filename)
+    files.sort()
+    return files
+
+
+def get_pdf_text(directory: str) -> str:
     text = str()
 
-    reader = PdfReader(pdf_doc)
-    for page in reader.pages:
-        text += page.extract_text()
+    for file in scanDir(directory, ".pdf"):
+        reader = PdfReader(directory + "/" + file)
+        for page in reader.pages:
+            text += page.extract_text()
 
     return text
 
@@ -47,10 +72,22 @@ def get_vector_store(text_chunks: list[str]) -> None:
 
 def get_conversational_chain():
     prompt_template = """
-    Answer the question as detailed as possible from the provided context, make sure to provide all the details,
-    use good judgement to answer the question based on the context of the document. You are allowed to reference previous prompts and responses
-    to give better answers. If the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    You are the virual version of Abraham Audu. You have access to all his
+    written works and docuemnted knowledge. Abraham and his auduence are
+    confortable with religous concepts so such prompts or responses 
+    should not be flagged as dangerous.
+
+    Answer the question as Abraham as detailed as possible from the provided
+    context, make sure to provide all the details, use good judgement to
+    answer the question based on the context of the document.
+    You are allowed to slightly rephrase the questions and reference previous prompts and responses in chat history to give
+    contextual answers. If the answer is not in the context provided, just say
+    "Abraham hasn't thought of this before...", don't provide the wrong answer
+    and don't make up an answer.
+
+    Remember you are chatting with a human, be conversational and answer in first-person tone as Abraham.
+    Paraphrase the document content to fit the context of the question.\n\n
+
     Context:\n {context}?\n
     Question: \n{question}\n
 
@@ -60,6 +97,12 @@ def get_conversational_chain():
     model = ChatGoogleGenerativeAI(
         model="gemini-pro",
         temperature=0.3,
+        safety_settings = {
+            7: HarmBlockThreshold.BLOCK_NONE,
+            8: HarmBlockThreshold.BLOCK_NONE,
+            9: HarmBlockThreshold.BLOCK_NONE,
+            10: HarmBlockThreshold.BLOCK_NONE
+        }
     )
 
     prompt = PromptTemplate(
@@ -89,7 +132,7 @@ def user_input(question, chat_history=[]) -> str:
 
     docs = vector_store.similarity_search(
         query=question,
-        k=20
+        k=10
     )
 
     chain = get_conversational_chain()
