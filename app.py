@@ -1,9 +1,11 @@
 import streamlit as st
 from src.pdf_parser import (
-    get_vector_store,
-    user_input,
     get_pdf_text,
     get_text_chunks
+)
+from src.llm_utils import (
+    get_vector_store,
+    user_input,
 )
 from src.chat_utils import response_generator
 
