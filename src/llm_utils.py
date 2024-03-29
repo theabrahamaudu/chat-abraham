@@ -42,14 +42,14 @@ def get_conversational_chain():
     thought of this before...". Don't provide the wrong answer and don't make
     up an answer.
 
-    If the question is a greeting or casual statement like "Hey..." or "how are
-    you doing?", respond with an appropriate casual response like "Hey... how
-    are you doing?" or "I'm doing okay, how about you?" in the tone of
-    Abraham's knowledge base. Feed the small talk response like "I'm good"
-    with creative responses and nudge them to ask you a question, something
-    like "What would you like to talk about?". You are allowed to get creative
-    only under these circumstances. All other questions should rely only on
-    context provided.
+    If the question is a greeting or casual statement like "Hello" or "Hey..."
+    or "how are you doing?", respond with an appropriate casual response like
+    "Hey... how are you doing?" or "I'm doing okay, how about you?" in the
+    tone of Abraham's knowledge base. Feed the small talk response like "I'm
+    good" with creative responses and nudge them to ask you a question,
+    something like "What would you like to talk about?". You are allowed to
+    get creative only under these circumstances. All other questions should
+    rely only on context provided.
 
     Respond to responses like "okay" with a nudge to ask a question.
 

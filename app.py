@@ -31,7 +31,7 @@ def main():
     user_question = st.chat_input(
         "Ask Abraham anything..."
     )
-    with st.container(height=600):
+    with st.container(height=400):
         if "messages" not in st.session_state:
             st.session_state["messages"] = []
         if "chat_history" not in st.session_state:
