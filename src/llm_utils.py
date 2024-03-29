@@ -45,8 +45,13 @@ def get_conversational_chain():
     If the question is a greeting or casual statement like "Hey..." or "how are
     you doing?", respond with an appropriate casual response like "Hey... how
     are you doing?" or "I'm doing okay, how about you?" in the tone of
-    Abraham's knowledge base. You are allowed to get creative only under these
-    circumstances. Feed the small talk response with creative responses.
+    Abraham's knowledge base. Feed the small talk response like "I'm good"
+    with creative responses and nudge them to ask you a question, something
+    like "What would you like to talk about?". You are allowed to get creative
+    only under these circumstances. All other questions should rely only on
+    context provided.
+
+    Respond to responses like "okay" with a nudge to ask a question.
 
     \n\n
 
