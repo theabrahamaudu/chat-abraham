@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from src.pdf_parser import (
     get_pdf_text,
@@ -50,17 +51,20 @@ def main():
 
             with st.chat_message("assistant"):
                 with st.spinner("Reading Abraham's mind..."):
+                    start = time.time()
                     response = user_input(
                         user_question,
                         st.session_state["chat_history"]
                     )
-                    st.write_stream(response_generator(response))
+                    resp_time = time.time() - start
+                    st.markdown(response)
             st.session_state["messages"].append(
                 {"role": "assistant", "content": response}
             )
             st.session_state["chat_history"].append(
                 (user_question, response)
             )
+            st.success(f"Response generated in {resp_time:.2f} seconds")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ from langchain_google_genai import (
     GoogleGenerativeAIEmbeddings,
     ChatGoogleGenerativeAI
 )
+from langchain_community.llms import ollama
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import faiss
@@ -18,21 +19,29 @@ def get_vector_store(text_chunks: list[str]) -> None:
     )
     vectore_store.save_local("./local_index")
 
+cuts = """
+Your responses don't have to be
+    the verbatim version of his knowledge base.
 
+You can use good judgement to answer the
+    question based on the context provided. You can give close or approximate
+    answers to questions based on the context provided.
+
+You are allowed to
+    get creative only under these circumstances. All other questions should
+    rely only on context provided.
+"""
 def get_conversational_chain():
     prompt_template = """
     You are Abraham Audu, some call you Ab. You have access to all his
-    written works and documented knowledge. Your responses don't have to be
-    the verbatim version of his knowledge base. You are allowed to paraphrase
+    written works and documented knowledge. You are allowed to paraphrase
     the response and make it more suited to how the question was asked.
 
     Use the context provided to answer questions.
 
     You are required to answer the question in first-person tone as if Abraham
     himself was responding to the chat. Make sure to provide detailed answers
-    based on the context provided. You can use good judgement to answer the
-    question based on the context provided. You can give close or approximate
-    answers to questions based on the context provided.
+    based on the context provided.
 
     You are allowed to and should reference previous prompts and responses
     where the question references previous prompts and/or references or the
@@ -47,9 +56,7 @@ def get_conversational_chain():
     "Hey... how are you doing?" or "I'm doing okay, how about you?" in the
     tone of Abraham's knowledge base. Respond to responses like "I'm
     good and you?", "I'm good", "I'm okay" with a nudge to ask you a question,
-    something like "What would you like to talk about?". You are allowed to
-    get creative only under these circumstances. All other questions should
-    rely only on context provided.
+    something like "What would you like to talk about?".
 
     Respond to responses like "okay" with a nudge to ask a question.
 
@@ -61,15 +68,21 @@ def get_conversational_chain():
     Answer:
     """
 
-    model = ChatGoogleGenerativeAI(  # type: ignore
-        model="gemini-pro",
+    # model = ChatGoogleGenerativeAI(  # type: ignore
+    #     model="gemini-pro",
+    #     temperature=0.3,
+    #     safety_settings={
+    #         7: HarmBlockThreshold.BLOCK_NONE,
+    #         8: HarmBlockThreshold.BLOCK_NONE,
+    #         9: HarmBlockThreshold.BLOCK_NONE,
+    #         10: HarmBlockThreshold.BLOCK_NONE
+    #     }
+    # )
+
+    model = ollama.Ollama(
+        model="mistral",
         temperature=0.3,
-        safety_settings={
-            7: HarmBlockThreshold.BLOCK_NONE,
-            8: HarmBlockThreshold.BLOCK_NONE,
-            9: HarmBlockThreshold.BLOCK_NONE,
-            10: HarmBlockThreshold.BLOCK_NONE
-        }
+        verbose=True
     )
 
     prompt = PromptTemplate(
